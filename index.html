@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMPAH | Compras Públicas de Alimentos del Huila</title>
+  <meta name="description" content="COMPAH conecta pequeños productores agropecuarios del Huila con operadores y entidades públicas para compras locales de alimentos en el marco de la Ley 2046 de 2020." />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQxPmtu8uKzP9ccxkn1wM8IF3hLkFM=" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <section id="loginScreen" class="login-screen" aria-label="Ingreso al aplicativo COMPAH">
+    <div class="login-bg"></div>
+    <div class="login-card-v11">
+      <div class="login-left-v11">
+        <div class="login-logo-row">
+          <img src="assets/logo-gobernacion-huila.png" alt="Gobernación del Huila" />
+          <img src="assets/logo-infihuila.png" alt="InfiHuila" />
+        </div>
+        <span class="login-chip">Versión 1.5 · Prototipo institucional</span>
+        <h1>COMPAH</h1>
+        <h2>Compras Públicas de Alimentos del Huila</h2>
+        <p>Ingresa para acceder al tablero, mapa territorial, validación de compras locales y seguimiento de cumplimiento de la Ley 2046 de 2020.</p>
+        <div class="login-mini-kpis">
+          <div><strong>37</strong><span>Municipios</span></div>
+          <div><strong>30%</strong><span>Meta mínima Ley 2046</span></div>
+          <div><strong>ACFC</strong><span>Enfoque rural</span></div>
+        </div>
+      </div>
+      <form id="entryLoginForm" class="login-form-v11">
+        <h3>¡Bienvenido!</h3>
+        <label>Usuario
+          <input id="entryUser" type="text" value="admin.compah@huila.gov.co" required />
+        </label>
+        <label>Contraseña
+          <input id="entryPassword" type="password" value="demo2026" required />
+        </label>
+        <label>Rol de acceso
+          <select id="entryRole">
+            <option>Administrador</option>
+            <option>Supervisor</option>
+            <option>Operador</option>
+            <option>Productor</option>
+            <option>Entidad pública</option>
+          </select>
+        </label>
+        <button class="btn primary wide" type="submit">Ingresar al aplicativo</button>
+        <button class="btn ghost wide" type="button" id="entryMoreInfo">Más información</button>
+        <p class="login-note">Demo funcional: puedes ingresar con los datos precargados. El registro no constituye adjudicación ni reemplaza SECOP II.</p>
+      </form>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar" aria-label="Navegación principal">
+      <div class="brand-card">
+        <img src="assets/logo-infihuila.png" alt="Logo InfiHuila" class="brand-logo" />
+        <span class="badge">Prototipo institucional v1.5</span>
+        <h1>COMPAH</h1>
+        <p>Compras Públicas de Alimentos del Huila</p>
+      </div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="home">Inicio</button>
+        <button class="nav-item" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="mapa">Mapa Huila</button>
+        <button class="nav-item" data-view="productores">Productores</button>
+        <button class="nav-item" data-view="productos">Productos</button>
+        <button class="nav-item" data-view="contratos">Contratos</button>
+        <button class="nav-item" data-view="compras">Compras locales</button>
+        <button class="nav-item" data-view="supervision">Supervisión</button>
+        <button class="nav-item" data-view="registro">Registro</button>
+        <button class="nav-item" data-view="reportes">Reportes</button>
+      </nav>
+      <div class="legal-mini">
+        <strong>Ley 2046 de 2020</strong>
+        <span>Mínimo 30% de compra local a pequeños productores y ACFC.</span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menuToggle" class="menu-toggle" aria-label="Abrir menú">☰</button>
+        <div class="topbar-logos">
+          <img src="assets/logo-gobernacion-huila.png" alt="Gobernación del Huila" />
+        </div>
+        <div class="topbar-actions">
+          <select id="roleSelector" aria-label="Seleccionar rol">
+            <option value="Administrador">Administrador</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Operador">Operador</option>
+            <option value="Productor">Productor</option>
+            <option value="Entidad">Entidad pública</option>
+          </select>
+          <button class="btn secondary" id="logoutBtn">Cerrar sesión</button>
+        </div>
+      </header>
+
+      <section id="view-home" class="view active-view">
+        <div class="hero">
+          <div class="hero-content">
+            <span class="eyebrow">Gobernación del Huila · InfiHuila · Gobierno Digital</span>
+            <h2>Del campo huilense a la mesa pública</h2>
+            <p>COMPAH es un prototipo institucional para conectar productores locales, organizaciones ACFC, operadores, supervisores y entidades compradoras, facilitando la trazabilidad de las compras públicas de alimentos en el marco de la Ley 2046 de 2020.</p>
+            <div class="hero-actions">
+              <button class="btn primary" data-view-target="dashboard">Ver dashboard</button>
+              <button class="btn ghost" data-view-target="registro">Registrar actor</button>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <div class="stat-highlight">
+              <span>Meta normativa</span>
+              <strong>30%</strong>
+              <p>Compra local mínima sobre recursos destinados a alimentos.</p>
+            </div>
+            <div class="mini-grid">
+              <div><strong>37</strong><span>municipios</span></div>
+              <div><strong>ACFC</strong><span>enfoque rural</span></div>
+              <div><strong>PAE</strong><span>programas públicos</span></div>
+              <div><strong>BI</strong><span>datos y reportes</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>Arquitectura funcional</span>
+          <h3>Un sistema de información, trazabilidad y supervisión contractual</h3>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="icon">🌱</span>
+            <h4>Banco de oferta local</h4>
+            <p>Productores, asociaciones y organizaciones ACFC por municipio, vereda, producto, capacidad y estacionalidad.</p>
+          </article>
+          <article class="feature-card">
+            <span class="icon">📑</span>
+            <h4>Contratos alimentarios</h4>
+            <p>Asociación entre entidad, operador, supervisor, valor de alimentos y porcentaje de cumplimiento.</p>
+          </article>
+          <article class="feature-card">
+            <span class="icon">✅</span>
+            <h4>Validación supervisora</h4>
+            <p>Soportes, observaciones, aprobación de compras, alertas de incumplimiento y reportes trazables.</p>
+          </article>
+          <article class="feature-card">
+            <span class="icon">🗺️</span>
+            <h4>Mapa territorial</h4>
+            <p>Visualización de oferta, demanda, productos estratégicos y brechas por los 37 municipios del Huila.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-dashboard" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Panel ejecutivo</span>
+            <h3>Indicadores COMPAH</h3>
+          </div>
+          <button class="btn secondary" id="refreshKpis">Actualizar indicadores</button>
+        </div>
+        <div id="kpiGrid" class="kpi-grid"></div>
+        <div id="kpiInsight" class="panel kpi-insight"><strong>Lectura ejecutiva:</strong> selecciona un indicador para ver la interpretación gerencial y operativa.</div>
+        <div class="dashboard-grid">
+          <div class="panel large-panel">
+            <div class="panel-header">
+              <h4>Cumplimiento por contrato</h4>
+              <span class="hint">Cálculo automático Ley 2046</span>
+            </div>
+            <div id="contractBars" class="bar-chart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Compras por línea</h4>
+              <span class="hint">Valores simulados</span>
+            </div>
+            <div id="categoryDonut" class="donut-list"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h4>Alertas prioritarias</h4>
+            <span class="hint">Contratos, documentos y trazabilidad</span>
+          </div>
+          <div id="alertList" class="alert-list"></div>
+        </div>
+      </section>
+
+      <section id="view-mapa" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Territorio productivo</span>
+            <h3>Mapa interactivo del Huila</h3>
+          </div>
+          <div class="filters compact">
+            <select id="mapProductFilter"></select>
+            <select id="mapRegionFilter"></select>
+          </div>
+        </div>
+        <div class="map-layout">
+          <div id="map" class="map"></div>
+          <div class="panel map-panel">
+            <h4>Lectura territorial</h4>
+            <p>Los marcadores representan productores y organizaciones registrados. El filtro permite identificar concentración de oferta por producto y subregión.</p>
+            <div id="mapSummary" class="map-summary"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-productores" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Banco agroalimentario público</span>
+            <h3>Productores y organizaciones</h3>
+          </div>
+          <div class="filters">
+            <input id="producerSearch" type="search" placeholder="Buscar productor, municipio o producto" />
+            <select id="producerMunicipioFilter"></select>
+            <select id="producerTipoFilter">
+              <option value="Todos">Todos</option>
+              <option value="Productor individual">Productor individual</option>
+              <option value="Organización ACFC">Organización ACFC</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Productor / Organización</th>
+                <th>Municipio</th>
+                <th>Tipo</th>
+                <th>Productos</th>
+                <th>Capacidad mensual</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="producerTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-productos" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Catálogo de alimentos</span>
+            <h3>Líneas agroalimentarias priorizadas</h3>
+          </div>
+          <input id="productSearch" type="search" placeholder="Buscar producto o categoría" />
+        </div>
+        <div id="productCatalog" class="product-grid"></div>
+        <div id="productInsight" class="panel product-insight-v15"></div>
+      </section>
+
+      <section id="view-contratos" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Módulo contractual</span>
+            <h3>Contratos con suministro de alimentos</h3>
+          </div>
+          <button class="btn primary" data-simulate-contract>Nuevo contrato simulado</button>
+        </div>
+        <div id="contractsGrid" class="contract-grid"></div>
+      </section>
+
+      <section id="view-compras" class="view">
+        <div class="section-title row-between">
+          <div>
+            <span>Trazabilidad de compras</span>
+            <h3>Registro de compras locales</h3>
+          </div>
+          <button class="btn primary" id="addPurchaseBtn">Registrar compra demo</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Contrato</th>
+                <th>Productor</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Valor</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="purchaseTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-supervision" class="view">
+        <div class="section-title">
+          <span>Rol supervisor</span>
+          <h3>Validación de soportes y compras reportadas</h3>
+        </div>
+        <div id="supervisionList" class="supervision-list"></div>
+      </section>
+
+      <section id="view-registro" class="view">
+        <div class="section-title">
+          <span>Registro asistido</span>
+          <h3>Formulario institucional por actor</h3>
+        </div>
+        <div class="form-layout">
+          <form id="registryForm" class="panel form-panel">
+            <div class="form-row">
+              <label>Tipo de actor
+                <select name="tipo" required>
+                  <option>Productor individual</option>
+                  <option>Organización ACFC</option>
+                  <option>Operador</option>
+                  <option>Supervisor</option>
+                  <option>Entidad pública</option>
+                </select>
+              </label>
+              <label>Municipio
+                <select name="municipio" id="registryMunicipio"></select>
+              </label>
+            </div>
+            <label>Nombre / Razón social
+              <input name="nombre" placeholder="Ej. Asociación Agropecuaria del Magdalena" required />
+            </label>
+            <div class="form-row">
+              <label>Documento / NIT
+                <input name="documento" placeholder="NIT o cédula" required />
+              </label>
+              <label>Producto principal
+                <select name="producto" id="registryProduct"></select>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>Capacidad mensual
+                <input name="capacidad" type="number" min="1" placeholder="Cantidad" />
+              </label>
+              <label>Unidad
+                <select name="unidad">
+                  <option>kg</option>
+                  <option>litros</option>
+                  <option>unidades</option>
+                  <option>arrobas</option>
+                </select>
+              </label>
+            </div>
+            <label>Observaciones
+              <textarea name="observaciones" rows="4" placeholder="Certificaciones, vereda, ruta logística, documentos pendientes..."></textarea>
+            </label>
+            <label class="checkbox-line">
+              <input type="checkbox" required />
+              Declaro que la información es veraz y autorizo el tratamiento de datos para fines institucionales de COMPAH.
+            </label>
+            <button class="btn primary" type="submit">Guardar registro demo</button>
+          </form>
+          <div class="panel legal-panel">
+            <h4>Advertencia jurídica</h4>
+            <p>El registro en COMPAH no constituye adjudicación, habilitación contractual ni obligación de compra. La plataforma es un instrumento de información, articulación, trazabilidad y seguimiento de compras públicas locales de alimentos en el marco de la Ley 2046 de 2020.</p>
+            <h4>Validaciones sugeridas</h4>
+            <ul>
+              <li>RUT / documento de identidad.</li>
+              <li>Condición de pequeño productor o ACFC.</li>
+              <li>Requisitos sanitarios ICA / INVIMA cuando aplique.</li>
+              <li>Capacidad de entrega y trazabilidad territorial.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-reportes" class="view">
+        <div class="section-title">
+          <span>Datos abiertos e informes</span>
+          <h3>Reportes institucionales</h3>
+        </div>
+        <div class="report-grid">
+          <button class="report-card" data-report="contrato">📑 Reporte por contrato</button>
+          <button class="report-card" data-report="municipio">🗺️ Reporte por municipio</button>
+          <button class="report-card" data-report="operador">🚚 Reporte por operador</button>
+          <button class="report-card" data-report="ley2046">⚖️ Cumplimiento Ley 2046</button>
+          <button class="report-card" data-report="acfc">🌱 Participación ACFC</button>
+          <button class="report-card" data-report="alertas">🚨 Alertas de supervisión</button>
+        </div>
+        <div id="reportOutput" class="panel report-output"></div>
+      </section>
+
+      <footer class="footer">
+        <p><strong>COMPAH · Prototipo funcional.</strong> Sistema complementario de información y trazabilidad. No reemplaza SECOP II ni los procedimientos de contratación pública.</p>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="loginDialog" class="login-dialog">
+    <form method="dialog" class="login-box">
+      <img src="assets/logo-gobernacion-huila.png" alt="Gobernación del Huila" />
+      <h3>Ingreso simulado</h3>
+      <input type="email" placeholder="correo@huila.gov.co" />
+      <input type="password" placeholder="Contraseña" />
+      <select>
+        <option>Administrador</option>
+        <option>Supervisor</option>
+        <option>Operador</option>
+        <option>Productor</option>
+      </select>
+      <div class="dialog-actions">
+        <button class="btn ghost" value="cancel">Cancelar</button>
+        <button class="btn primary" value="default">Ingresar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
