@@ -1,8 +1,8 @@
-# COMPAH — Compras Públicas de Alimentos del Huila v1.3
+# COMPAH — Compras Públicas de Alimentos del Huila v1.5
 
 Prototipo funcional institucional para conectar productores locales, organizaciones ACFC, operadores, supervisores y entidades compradoras en el marco de la Ley 2046 de 2020.
 
-## Novedades v1.3
+## Novedades v1.5
 
 - Pantalla de inicio tipo login antes de acceder al aplicativo.
 - Mapa territorial del Huila ajustado con enfoque departamental, marcadores y polígono aproximado.
@@ -39,3 +39,16 @@ El registro en COMPAH no constituye adjudicación, habilitación contractual ni 
 - Reconstrucción del mapa al entrar a la vista para evitar tiles dispersos.
 - Ajuste de enfoque al Huila y marcadores estilo desarrollo Día E.
 - Botones de mapa: Ajustar Huila y Ver oferta.
+
+
+## Versión 1.5
+Rediseño premium ejecutivo con predominio de blanco, tarjetas KPI sobrias, paneles institucionales limpios, mayor jerarquía visual y mapa conservado con lectura dinámica al pasar el cursor sobre marcadores.
+
+
+## Versión 1.5
+
+- Rediseño premium sobrio con predominio de blanco.
+- Corrección de jerarquía tipográfica: menor uso de negrilla pesada, tamaños fluidos y valores KPI sin desbordamiento.
+- KPIs minimalistas, ejecutivos y con auto scale para valores largos.
+- Catálogo de productos más interactivo: tarjetas con métricas, panel de lectura por línea y botón para analizar el producto en el mapa.
+- Menor carga cromática en layout, dashboard, tarjetas y gráficos.

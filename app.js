@@ -812,3 +812,208 @@ document.addEventListener('DOMContentLoaded', () => {
   const chip = document.querySelector('.login-chip');
   if (chip) chip.textContent = 'Versión 1.3 · Prototipo institucional';
 });
+
+/* ==========================================================
+   COMPAH v1.4 · Render premium ejecutivo
+   ========================================================== */
+function setKpiInsightPremium(label, value, note, score) {
+  const target = document.querySelector('#kpiInsight');
+  if (!target) return;
+  target.innerHTML = `<h4>${label} <span class="insight-value">${value}</span></h4><p>${note}</p><small>Lectura gerencial: ${score}% · herramienta de seguimiento para dirección, supervisión y toma de decisiones.</small>`;
+}
+
+function renderKpis() {
+  const municipiosCubiertos = new Set(COMPAH.productores.map(p => p.municipio)).size;
+  const totalContratos = state.contracts.reduce((acc, c) => acc + c.valorTotal, 0);
+  const totalLocal = state.contracts.reduce((acc, c) => acc + c.comprasLocales, 0);
+  const totalAlimentos = state.contracts.reduce((acc, c) => acc + c.valorAlimentos, 0);
+  const comprasValidadas = state.purchases.filter(p => p.estado === 'Aprobado').length;
+  const alertas = state.contracts.filter(c => percent(c) < 30).length + COMPAH.productores.filter(p => p.estado !== 'Validado').length;
+  const compliance = Math.round((totalLocal / totalAlimentos) * 100);
+  const validatedPct = Math.round((comprasValidadas / Math.max(state.purchases.length, 1)) * 100);
+  const acfc = COMPAH.productores.filter(p => p.tipo === 'Organización ACFC').length;
+  const kpis = [
+    { label: 'Productores', sub:'registrados', value: number(COMPAH.productores.length), score: 92, accent: 'var(--premium-teal)', note: 'Base productiva departamental georreferenciada para activar compras públicas locales por municipio, vereda y producto.' },
+    { label: 'Organizaciones', sub:'ACFC', value: number(acfc), score: Math.min(100, acfc * 7), accent: 'var(--premium-teal)', note: 'Núcleo de asociatividad rural para consolidar volúmenes, formalización y capacidad de respuesta contractual.' },
+    { label: 'Productos', sub:'ofertados', value: number(COMPAH.productos.length), score: 80, accent: 'var(--premium-gold)', note: 'Catálogo agroalimentario con pasifloras, lácteos, carnes, hortalizas, café, cacao, piscícola y transformados.' },
+    { label: 'Cobertura', sub:'municipal', value: `${municipiosCubiertos}/37`, score: Math.round(municipiosCubiertos / 37 * 100), accent: 'var(--premium-teal)', note: 'Cobertura total para análisis territorial y lectura de brechas de abastecimiento en el departamento.' },
+    { label: 'Contratos', sub:'registrados', value: number(state.contracts.length), score: Math.min(100, state.contracts.length * 15), accent: 'var(--premium-blue)', note: 'Contratos alimentarios vinculados a entidad, operador, supervisor y cálculo automático de cumplimiento.' },
+    { label: 'Valor contractual', sub:'total', value: money(totalContratos), score: 76, accent: 'var(--premium-blue)', note: 'Universo contractual simulado para programas públicos de alimentación y seguimiento presupuestal.' },
+    { label: 'Compra local', sub:'acumulada', value: money(totalLocal), score: Math.min(100, compliance + 28), accent: 'var(--premium-teal)', note: 'Valor trazado como compra a pequeños productores y organizaciones ACFC dentro del sistema.' },
+    { label: 'Cumplimiento', sub:'Ley 2046', value: `${compliance}%`, score: compliance, accent: compliance < 30 ? 'var(--premium-red)' : 'var(--premium-teal)', note: 'Indicador estratégico: mínimo 30% sobre recursos destinados a alimentos. Prioriza contratos en riesgo.' },
+    { label: 'Compras', sub:'validadas', value: number(comprasValidadas), score: validatedPct, accent: 'var(--premium-teal)', note: 'Compras con soporte aprobado por supervisor, necesarias para trazabilidad y defensa contractual.' },
+    { label: 'Alertas', sub:'activas', value: number(alertas), score: Math.max(8, 100 - alertas * 10), accent: alertas > 4 ? 'var(--premium-red)' : 'var(--premium-teal)', note: 'Alertas por bajo cumplimiento, documentos pendientes, validaciones o riesgos de concentración.' }
+  ];
+
+  const target = document.querySelector('#kpiGrid');
+  if (!target) return;
+  target.innerHTML = kpis.map((k, idx) => `
+    <article class="kpi-card" data-kpi-index="${idx}" style="--score:${k.score}; --accent:${k.accent}">
+      <span>${k.label}<br>${k.sub}</span>
+      <strong>${k.value}</strong>
+      <small>${k.score}% lectura ejecutiva</small>
+      <div class="kpi-line"><b></b></div>
+    </article>`).join('');
+
+  document.querySelectorAll('.kpi-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const k = kpis[Number(card.dataset.kpiIndex)];
+      setKpiInsightPremium(k.label + ' ' + k.sub, k.value, k.note, k.score);
+    });
+  });
+  const principal = kpis[7];
+  setKpiInsightPremium(principal.label + ' ' + principal.sub, principal.value, principal.note, principal.score);
+}
+
+function buildHuilaIconV13(tipo) {
+  const fill = tipo === 'Organización ACFC' ? '#c8d600' : '#006c70';
+  return L.divIcon({
+    className: 'compah-marker-v13',
+    html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:${fill};border:4px solid white;box-shadow:0 12px 26px rgba(0,108,112,.26)"></span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const badge = document.querySelector('.brand-card .badge');
+  if (badge) badge.textContent = 'Prototipo institucional v1.4';
+  const chip = document.querySelector('.login-chip');
+  if (chip) chip.textContent = 'Versión 1.4 · Diseño premium ejecutivo';
+  const title = document.querySelector('.hero-content h2');
+  if (title) title.innerHTML = 'Compras públicas locales con trazabilidad ejecutiva';
+});
+
+
+/* ==============================
+   COMPAH v1.5 · Rediseño visual premium, KPIs autoscale y catálogo interactivo
+   ============================== */
+function shortMoney(value) {
+  if (value >= 1000000000) {
+    const n = value / 1000000000;
+    return `$ ${n.toLocaleString('es-CO', { maximumFractionDigits: n >= 10 ? 1 : 2 })} mil M`;
+  }
+  if (value >= 1000000) {
+    return `$ ${(value / 1000000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} M`;
+  }
+  return money(value);
+}
+
+function renderKpis() {
+  const municipiosCubiertos = new Set(COMPAH.productores.map(p => p.municipio)).size;
+  const totalContratos = state.contracts.reduce((acc, c) => acc + c.valorTotal, 0);
+  const totalLocal = state.contracts.reduce((acc, c) => acc + c.comprasLocales, 0);
+  const totalAlimentos = state.contracts.reduce((acc, c) => acc + c.valorAlimentos, 0);
+  const comprasValidadas = state.purchases.filter(p => p.estado === 'Aprobado').length;
+  const alertas = state.contracts.filter(c => percent(c) < 30).length + COMPAH.productores.filter(p => p.estado !== 'Validado').length;
+  const compliance = Math.round((totalLocal / Math.max(totalAlimentos, 1)) * 100);
+  const validatedPct = Math.round((comprasValidadas / Math.max(state.purchases.length, 1)) * 100);
+  const acfc = COMPAH.productores.filter(p => p.tipo === 'Organización ACFC').length;
+
+  const kpis = [
+    { label: 'Productores', value: number(COMPAH.productores.length), full: number(COMPAH.productores.length), score: 92, note: 'Base de productores y organizaciones por municipio, vereda, producto, capacidad y estado documental.' },
+    { label: 'Organizaciones ACFC', value: number(acfc), full: number(acfc), score: Math.min(100, acfc * 7), note: 'Actores asociativos priorizados para fortalecer compras públicas locales y circuitos cortos.' },
+    { label: 'Productos ofertados', value: number(COMPAH.productos.length), full: number(COMPAH.productos.length), score: 80, note: 'Catálogo agroalimentario con lácteos, carnes, frutas, pasifloras, piscícola, hortalizas, café, cacao y transformados.' },
+    { label: 'Cobertura municipal', value: `${municipiosCubiertos}/37`, full: `${municipiosCubiertos}/37 municipios`, score: Math.round(municipiosCubiertos / 37 * 100), note: 'Cobertura territorial para lectura de oferta, demanda y brechas de abastecimiento.' },
+    { label: 'Contratos', value: number(state.contracts.length), full: number(state.contracts.length), score: Math.min(100, state.contracts.length * 15), note: 'Contratos alimentarios asociados a entidad, operador, supervisor y meta de cumplimiento.' },
+    { label: 'Valor contractual', value: shortMoney(totalContratos), full: money(totalContratos), score: 76, note: 'Universo contractual simulado de programas alimentarios con recursos públicos.' },
+    { label: 'Compra local', value: shortMoney(totalLocal), full: money(totalLocal), score: Math.min(100, compliance + 28), note: 'Valor reportado como comprado a pequeños productores locales y organizaciones ACFC.' },
+    { label: 'Ley 2046', value: `${compliance}%`, full: `${compliance}%`, score: compliance, note: 'Indicador central de cumplimiento. La meta mínima es 30% sobre los recursos destinados a alimentos.' },
+    { label: 'Compras validadas', value: number(comprasValidadas), full: number(comprasValidadas), score: validatedPct, note: 'Compras con soporte revisado y aprobado por supervisor.' },
+    { label: 'Alertas activas', value: number(alertas), full: number(alertas), score: Math.max(8, 100 - alertas * 10), note: 'Alertas por bajo cumplimiento, soportes pendientes o documentación por subsanar.' }
+  ];
+
+  $('#kpiGrid').innerHTML = kpis.map((k, idx) => {
+    const level = k.score >= 75 ? 'alto' : k.score >= 35 ? 'medio' : 'riesgo';
+    return `<article class="kpi-card kpi-card-v15 ${level}" data-kpi-index="${idx}">
+      <div class="kpi-head-v15"><span>${k.label}</span><em>${k.score}%</em></div>
+      <strong title="${k.full}">${k.value}</strong>
+      <small>lectura ejecutiva</small>
+      <div class="mini-progress-v15"><i style="width:${Math.max(6, Math.min(k.score,100))}%"></i></div>
+    </article>`;
+  }).join('');
+
+  $$('.kpi-card').forEach(card => {
+    card.addEventListener('click', () => {
+      $$('.kpi-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const k = kpis[Number(card.dataset.kpiIndex)];
+      setKpiInsight(k.label, k.full, k.note);
+    });
+  });
+  setKpiInsight('Cumplimiento Ley 2046', `${compliance}%`, 'Meta mínima normativa del 30%. El tablero prioriza contratos en riesgo, compras pendientes de validación y acciones de supervisión.');
+}
+
+function productStats(productName) {
+  const producers = COMPAH.productores.filter(p => p.productos.includes(productName));
+  const municipalities = new Set(producers.map(p => p.municipio));
+  const orgs = producers.filter(p => p.tipo === 'Organización ACFC').length;
+  const capacity = producers.reduce((acc, p) => acc + p.capacidad, 0);
+  return { producers, municipalities, orgs, capacity };
+}
+
+function setProductInsight(productName) {
+  const p = COMPAH.productos.find(x => x.nombre === productName) || COMPAH.productos[0];
+  if (!p || !$('#productInsight')) return;
+  const s = productStats(p.nombre);
+  const sample = s.producers.slice(0, 4).map(x => `<span>${x.municipio}</span>`).join('') || '<span>Sin municipios visibles</span>';
+  $('#productInsight').innerHTML = `<div class="product-insight-head-v15">
+      <div><small>Lectura de línea agroalimentaria</small><h4>${p.icono} ${p.nombre}</h4></div>
+      <button class="btn secondary" data-product-map="${p.nombre}">Ver en mapa</button>
+    </div>
+    <div class="product-insight-grid-v15">
+      <div><strong>${s.producers.length}</strong><span>productores / oferentes</span></div>
+      <div><strong>${s.municipalities.size}</strong><span>municipios con oferta</span></div>
+      <div><strong>${s.orgs}</strong><span>organizaciones ACFC</span></div>
+      <div><strong>${number(s.capacity)}</strong><span>capacidad agregada</span></div>
+    </div>
+    <p><strong>Categoría:</strong> ${p.categoria}. <strong>Unidad:</strong> ${p.unidad}. <strong>Requisito:</strong> ${p.requisito}.</p>
+    <div class="product-municipios-v15">${sample}</div>`;
+}
+
+function renderProducts() {
+  const search = $('#productSearch')?.value?.toLowerCase() || '';
+  const products = COMPAH.productos.filter(p => `${p.nombre} ${p.categoria} ${p.requisito}`.toLowerCase().includes(search));
+  $('#productCatalog').innerHTML = products.map(p => {
+    const s = productStats(p.nombre);
+    const pct = Math.min(100, Math.max(12, s.producers.length * 9));
+    return `<article class="product-card product-card-v15" data-product="${p.nombre}">
+      <div class="product-top-v15"><span class="product-icon-v15">${p.icono}</span><span class="tag">${p.categoria}</span></div>
+      <h4>${p.nombre}</h4>
+      <p>${p.requisito}</p>
+      <div class="product-metrics-v15">
+        <span><strong>${s.producers.length}</strong> oferentes</span>
+        <span><strong>${s.municipalities.size}</strong> municipios</span>
+        <span><strong>${number(s.capacity)}</strong> cap.</span>
+      </div>
+      <div class="mini-progress-v15"><i style="width:${pct}%"></i></div>
+      <button class="product-link-v15" data-product-map="${p.nombre}">Analizar línea</button>
+    </article>`;
+  }).join('') || '<div class="panel"><h4>Sin resultados</h4><p>Prueba con otra línea agroalimentaria o categoría.</p></div>';
+
+  const first = products[0]?.nombre || COMPAH.productos[0]?.nombre;
+  if (first) setProductInsight(first);
+
+  $$('.product-card-v15').forEach(card => {
+    const name = card.dataset.product;
+    card.addEventListener('mouseenter', () => setProductInsight(name));
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('[data-product-map]')) return;
+      $$('.product-card-v15').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      setProductInsight(name);
+    });
+  });
+}
+
+document.addEventListener('click', (event) => {
+  const productMap = event.target.closest('[data-product-map]');
+  if (!productMap) return;
+  const product = productMap.dataset.productMap;
+  const filter = $('#mapProductFilter');
+  if (filter) filter.value = product;
+  setView('mapa');
+  setTimeout(() => initMap(), 120);
+});
